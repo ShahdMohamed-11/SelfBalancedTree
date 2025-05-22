@@ -1,6 +1,6 @@
 package main;
 
-public class AVLTree<T extends Comparable<T>> implements Dictionary<T> {
+public class AVLTree<T extends Comparable<T>> implements Dictionary<T,Node<T>> {
     public Node<T> root;
 
     public AVLTree() {

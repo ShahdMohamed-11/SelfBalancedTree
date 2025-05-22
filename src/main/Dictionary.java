@@ -1,9 +1,7 @@
 package main;
 
-import main.Node;
-
-public interface Dictionary <T extends Comparable<T>> {
-    boolean Search(Node<T> root, T key);
-    Node<T> insert(Node<T> root, T key);
-    Node<T> delete(Node<T> root, T key);
+public interface Dictionary<T extends Comparable<T>, N> {
+    boolean Search(N root, T key);
+    N insert(N root, T key);
+    N delete(N root, T key);
 }
