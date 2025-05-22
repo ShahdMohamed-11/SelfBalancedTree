@@ -2,80 +2,11 @@ package com.example;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
-
+import org.junit.jupiter.api.Timeout;
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.concurrent.TimeUnit;
 
-public class TreeTest {
-
-    private RedBlackTree<Integer> rbTree;
-    private AVLTree<Integer> avlTree;
-
-    private final int N = 1_000_000;
-    private int[] insertedValues;
-
-    @BeforeEach
-    public void setup() {
-        rbTree = new RedBlackTree<>();
-        avlTree = new AVLTree<>();
-
-        insertedValues = new int[N];
-        Random rand = new Random(42); // fixed seed for reproducibility
-
-        for (int i = 0; i < N; i++) {
-            int val = rand.nextInt(Integer.MAX_VALUE);
-            insertedValues[i] = val;
-            rbTree.root = rbTree.insert(rbTree.root, val);
-            avlTree.root = avlTree.insert(avlTree.root, val);
-        }
-    }
-
-    // -------------------- RedBlackTree Tests --------------------
-
-    @Test
-    public void testRB_SearchForExistingValues() {
-        for (int i = 0; i < 1000; i++) {
-            assertTrue(rbTree.Search(rbTree.root, insertedValues[i]));
-        }
-    }
-
-    @Test
-    public void testRB_SearchForNonExistingValue() {
-        assertFalse(rbTree.Search(rbTree.root, -1));
-    }
-
-    @Test
-    public void testRB_Delete() {
-        for (int i = 0; i < 1000; i++) {
-            rbTree.root = rbTree.delete(rbTree.root, insertedValues[i]);
-            assertFalse(rbTree.Search(rbTree.root, insertedValues[i]));
-        }
-    }
-
-    @Test
-    public void testRB_InsertAndDeletePerformance() {
-        long start = System.currentTimeMillis();
-
-        RedBlackTree<Integer> tree = new RedBlackTree<>();
-        for (int i = 0; i < N; i++) {
-            tree.root = tree.insert(tree.root, i);
-        }
-
-        for (int i = 0; i < N; i++) {
-            assertTrue(tree.Search(tree.root, i));
-        }
-
-        for (int i = 0; i < N; i++) {
-            tree.root = tree.delete(tree.root, i);
-            assertFalse(tree.Search(tree.root, i));
-        }
-
-        long end = System.currentTimeMillis();
-        System.out.println("RedBlackTree time: " + (end - start) + "ms");
-    }
-
-    // -------------------- AVLTree Tests --------------------
+public class AVLTreeTest {
 
     private AVLTree<Integer> tree;
 
@@ -134,6 +65,10 @@ public class TreeTest {
         assertTrue(isAVLBalanced(tree.root), "Tree should remain balanced after deletions");
     }
 
+    /**
+     * Test 3: Rotation Correctness and Balance Factor
+     * Tests that rotations work correctly and balance factors are properly maintained
+     */
     @Test
     void testRotationCorrectnessAndBalanceFactor() {
         // Test Right-Right case (left rotation needed)
@@ -168,6 +103,7 @@ public class TreeTest {
     }
 
 
+
     private boolean isAVLBalanced(Node<Integer> node) {
         if (node == null) return true;
 
@@ -175,57 +111,5 @@ public class TreeTest {
         if (Math.abs(balance) > 1) return false;
 
         return isAVLBalanced(node.left) && isAVLBalanced(node.right);
-
-
     }
-
-    @Test
-    void compareRedBlackVsAVLPerformance() {
-        RedBlackTree<Integer> rb = new RedBlackTree<>();
-        AVLTree<Integer> avl = new AVLTree<>();
-        Random rand = new Random(42);
-
-        int[] values = new int[100000];
-        for (int i = 0; i < values.length; i++) {
-            values[i] = rand.nextInt(Integer.MAX_VALUE);
-        }
-
-        // ---------------- Insertion Time ----------------
-        long rbInsertStart = System.currentTimeMillis();
-        for (int val : values) {
-            rb.root = rb.insert(rb.root, val);
-        }
-        long rbInsertEnd = System.currentTimeMillis();
-
-        long avlInsertStart = System.currentTimeMillis();
-        for (int val : values) {
-            avl.root = avl.insert(avl.root, val);
-        }
-        long avlInsertEnd = System.currentTimeMillis();
-
-        // ---------------- Search Time ----------------
-        long rbSearchStart = System.nanoTime();
-        for (int val : values) {
-            assertTrue(rb.Search(rb.root, val));
-        }
-        long rbSearchEnd = System.nanoTime();
-
-        long avlSearchStart = System.nanoTime();
-        for (int val : values) {
-            assertTrue(avl.Search(avl.root, val));
-        }
-        long avlSearchEnd = System.nanoTime();
-
-        // ---------------- Tree Height ----------------
-        int rbHeight = rb.height(rb.root);
-        int avlHeight = avl.height(avl.root);
-
-        System.out.println("=== Red-Black Tree vs AVL Tree (100,000 elements) ===");
-        System.out.println("Insertion Time (ms) - RedBlackTree: " + (rbInsertEnd - rbInsertStart) + ", AVLTree: " + (avlInsertEnd - avlInsertStart));
-        System.out.println("Search Time (ms)    - RedBlackTree: " + ((rbSearchEnd - rbSearchStart) / 1_000_000) + ", AVLTree: " + ((avlSearchEnd - avlSearchStart) / 1_000_000));
-        System.out.println("Tree Height         - RedBlackTree: " + rbHeight + ", AVLTree: " + avlHeight);
-
-        assertTrue(rbHeight >= avlHeight);
-    }
-
 }
